@@ -44,8 +44,10 @@ collision1 (Ball n1 m1 r1 v1@(V2 vx1 vy1) p1@(V2 px1 py1) step1@(V2 dt1 dt1')) (
 
       nxt@(V2 nxtx nxty) = nxt1 - p
       cur@(V2 curx cury) = p1 - p
-      V2 cosp sinp  
-        | curx*nxty - nxtx*cury <0  = V2 (lr * cost - sqlr * sint)  (sqlr * cost + lr * sint)    -- clockwise
+      V2 cosp sinp 
+        | l < 1.0e-15 &&  cost > 0  = V2 (-sint) cost                                            -- phi = theta + pi
+        | l < 1.0e-15               = V2 sint    (-cost)                                         -- phi = theta - pi
+        | curx*nxty - nxtx*cury < 0 = V2 (lr * cost - sqlr * sint)  (sqlr * cost + lr * sint)    -- clockwise
         | otherwise                 = V2 (lr * cost + sqlr * sint)  (- sqlr * cost + lr * sint)
 
       mat        = V2 (V2 cosp sinp) (V2 (-sinp) cosp)
@@ -112,8 +114,10 @@ collision2' ball1@(Ball n1 m1 r1 v1@(V2 vx1 vy1) p1@(V2 px1 py1) step1@(V2 dt1 d
 
       nxt@(V2 nxtx nxty) = nxt1 - p
       cur@(V2 curx cury) = p1 - p
-      V2 cosp sinp  
-        | curx*nxty - nxtx*cury > 0 = V2 (lr * cost - sqlr * sint)  (sqlr * cost + lr * sint)    -- clockwise
+      V2 cosp sinp 
+        | l < 1.0e-15 &&  cost > 0  = V2 (-sint) cost                                            -- phi = theta + pi
+        | l < 1.0e-15               = V2 sint    (-cost)                                         -- phi = theta - pi
+        | curx*nxty - nxtx*cury < 0 = V2 (lr * cost - sqlr * sint)  (sqlr * cost + lr * sint)    -- clockwise
         | otherwise                 = V2 (lr * cost + sqlr * sint)  (- sqlr * cost + lr * sint)
 
       mat        = V2 (V2 cosp sinp) (V2 (-sinp) cosp)
