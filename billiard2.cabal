@@ -1,0 +1,21 @@
+name:           billiard2
+version:        0.1
+cabal-version:  >=1.2
+build-type:     Simple
+author:         kenji
+category:       Game
+license:        GPL
+synopsis:       Netwire Application
+
+executable billiard2
+  hs-source-dirs:  src
+  main-is:         Main.hs
+  build-depends:   base == 4.7.*
+               ,       netwire == 5.0.1
+               ,       GLFW    == 0.5.2.2
+               ,       OpenGL
+               ,       semigroups >=0.15 && <1
+               ,       transformers == 0.3.0.0
+               ,       linear == 1.20.1
+  ghc-options:     -Wall
+
