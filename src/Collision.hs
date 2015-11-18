@@ -33,7 +33,7 @@ collision1 (Ball n1 m1 r1 v1@(V2 vx1 vy1) p1@(V2 px1 py1) step1@(V2 dt1 dt1')) (
       invr       = 1 / r
 -- Position and velocity of the gravity center
       p          = (V2 (V2 px1 px2) (V2 py1 py2) !* V2 m1 m2) * V2 invm invm
-      v@(V2 _ vy)= (V2 (V2 vx1 vx2) (V2 vy1 vy2) !* V2 m1 m2) * V2 invm invm
+      v          = (V2 (V2 vx1 vx2) (V2 vy1 vy2) !* V2 m1 m2) * V2 invm invm
 -- Transportation matrix for the rotation coordinate system
       V2 dvx dvy = v1 - v2
       dv         = sqrt $ dvx * dvx + dvy * dvy
@@ -42,11 +42,9 @@ collision1 (Ball n1 m1 r1 v1@(V2 vx1 vy1) p1@(V2 px1 py1) step1@(V2 dt1 dt1')) (
       lr         = l * invr
       sqlr       = sqrt (r * r - l * l) * invr
 
-      nxt@(V2 nxtx nxty) = nxt1 - p
+      nxt@(V2 nxtx nxty) = nxt1 - nxtp
       cur@(V2 curx cury) = p1 - p
       V2 cosp sinp 
-        | l < 1.0e-15 &&  cost > 0  = V2 (-sint) cost                                            -- phi = theta + pi
-        | l < 1.0e-15               = V2 sint    (-cost)                                         -- phi = theta - pi
         | curx*nxty - nxtx*cury < 0 = V2 (lr * cost - sqlr * sint)  (sqlr * cost + lr * sint)    -- clockwise
         | otherwise                 = V2 (lr * cost + sqlr * sint)  (- sqlr * cost + lr * sint)
 
@@ -71,12 +69,13 @@ collision1 (Ball n1 m1 r1 v1@(V2 vx1 vy1) p1@(V2 px1 py1) step1@(V2 dt1 dt1')) (
       v1'        = invmat !* u1' + v
       v2'        = invmat !* u2' + v
 -- Difference between two balls at next step      
-      nxt1       = p1 + v1 * step1
-      nxt2       = p2 + v2 * step2
-      V2 dx dy   = nxt1 - nxt2
+      nxt1@(V2 nxtx1 nxty1) = p1 + v1 * step1
+      nxt2@(V2 nxtx2 nxty2) = p2 + v2 * step2
+      V2 dx dy              = nxt1 - nxt2
+      nxtp                  = (V2 (V2 nxtx1 nxtx2) (V2 nxty1 nxty2) !* V2 m1 m2) * V2 invm invm
 
 collision2 =
-  collision2' (Ball "ball1" mass1 radius1 vInit1 pInit1 (V2 1.0e-3 1.0e-3)) (Ball "ball2" mass2 radius2 vInit2 pInit2 (V2 1.0e-3 1.0e-3))
+  collision2' (Ball "ball1" mass1 radius1 vInit1 pInit1 (V2 1.0009e-3 1.0009e-3)) (Ball "ball2" mass2 radius2 vInit2 pInit2 (V2 1.0009e-3 1.0009e-3))
 
 collision2' :: Ball -> Ball -> IO()
 collision2' ball1@(Ball n1 m1 r1 v1@(V2 vx1 vy1) p1@(V2 px1 py1) step1@(V2 dt1 dt1')) ball2@(Ball n2 m2 r2 v2@(V2 vx2 vy2) p2@(V2 px2 py2) step2@(V2 dt2 dt2')) = do
@@ -89,6 +88,7 @@ collision2' ball1@(Ball n1 m1 r1 v1@(V2 vx1 vy1) p1@(V2 px1 py1) step1@(V2 dt1 d
       print $ "p: " ++ (show p) ++ "v: " ++ (show v)
       print $ "cost:" ++ (show cost) ++ " sint:" ++ (show sint) ++" l:" ++ (show l)
       print $ "cur:" ++ (show cur) ++ " nxt:" ++ (show nxt)
+      print $ "curx*nxty - nxtx*cury:" ++ (show (curx*nxty - nxtx*cury)) 
       print $ "cosp:" ++ (show cosp) ++ " sinp:" ++ (show sinp)
       print $ "a1:" ++ (show a1) ++ " b1:" ++ (show b1) ++ " a2:" ++ (show a2) ++ " b2:" ++ (show b2)
       print $ "ua1:" ++ (show ua1) ++ " ub1:" ++ (show ub1) ++ " ua2:" ++ (show ua2) ++ " ub2:"++ (show ub2)
@@ -103,7 +103,7 @@ collision2' ball1@(Ball n1 m1 r1 v1@(V2 vx1 vy1) p1@(V2 px1 py1) step1@(V2 dt1 d
       invr       = 1 / r
 -- Position and velocity of the gravity center
       p          = (V2 (V2 px1 px2) (V2 py1 py2) !* V2 m1 m2) * V2 invm invm
-      v@(V2 _ vy)= (V2 (V2 vx1 vx2) (V2 vy1 vy2) !* V2 m1 m2) * V2 invm invm
+      v          = (V2 (V2 vx1 vx2) (V2 vy1 vy2) !* V2 m1 m2) * V2 invm invm
 -- Transportation matrix for the rotation coordinate system
       V2 dvx dvy = v1 - v2
       dv         = sqrt $ dvx * dvx + dvy * dvy
@@ -112,11 +112,9 @@ collision2' ball1@(Ball n1 m1 r1 v1@(V2 vx1 vy1) p1@(V2 px1 py1) step1@(V2 dt1 d
       lr         = l * invr
       sqlr       = sqrt (r * r - l * l) * invr
 
-      nxt@(V2 nxtx nxty) = nxt1 - p
+      nxt@(V2 nxtx nxty) = nxt1 - nxtp
       cur@(V2 curx cury) = p1 - p
       V2 cosp sinp 
-        | l < 1.0e-15 &&  cost > 0  = V2 (-sint) cost                                            -- phi = theta + pi
-        | l < 1.0e-15               = V2 sint    (-cost)                                         -- phi = theta - pi
         | curx*nxty - nxtx*cury < 0 = V2 (lr * cost - sqlr * sint)  (sqlr * cost + lr * sint)    -- clockwise
         | otherwise                 = V2 (lr * cost + sqlr * sint)  (- sqlr * cost + lr * sint)
 
@@ -141,6 +139,7 @@ collision2' ball1@(Ball n1 m1 r1 v1@(V2 vx1 vy1) p1@(V2 px1 py1) step1@(V2 dt1 d
       v1'        = invmat !* u1' + v
       v2'        = invmat !* u2' + v
 -- Difference between two balls at next step      
-      nxt1       = p1 + v1 * step1
-      nxt2       = p2 + v2 * step2
-      V2 dx dy   = nxt1 - nxt2
+      nxt1@(V2 nxtx1 nxty1) = p1 + v1 * step1
+      nxt2@(V2 nxtx2 nxty2) = p2 + v2 * step2
+      V2 dx dy              = nxt1 - nxt2
+      nxtp                  = (V2 (V2 nxtx1 nxtx2) (V2 nxty1 nxty2) !* V2 m1 m2) * V2 invm invm
