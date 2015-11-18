@@ -4,6 +4,6 @@ http://bitterharvest.hatenablog.com/entry/2015/09/24/164937
 
 How to build your sysytem.
 
-cabal install --only-dependencies
-cabal configure
-cabal build
+  cabal install --only-dependencies
+  cabal configure
+  cabal build
